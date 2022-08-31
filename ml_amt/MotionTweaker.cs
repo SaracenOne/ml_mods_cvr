@@ -1,4 +1,4 @@
-﻿using ABI_RC.Core.Networking.IO.UserGeneratedContent;
+using ABI_RC.Core.Networking.IO.UserGeneratedContent;
 using ABI_RC.Core.Player;
 using ABI_RC.Systems.MovementSystem;
 using System.Collections.Generic;
@@ -70,7 +70,8 @@ namespace ml_amt
                 {
                     float immobileWeight = (PlayerSetup.Instance._movementSystem.movementVector.magnitude <= Mathf.Epsilon) ? 1f : 0f;
                     float standingWeight = m_standing ? 1f : 0f;
-                    m_locomotionWeight = standingWeight * immobileWeight;
+                    float flyingWeight = PlayerSetup.Instance._movementSystem.flying ? 0f : 1f;
+                    m_locomotionWeight = standingWeight * immobileWeight * flyingWeight;
                     m_vrIk.solver.locomotion.weight = m_locomotionWeight;
 
                     // Immediately update avatar position if locomotion is off
