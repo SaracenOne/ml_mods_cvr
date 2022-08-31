@@ -1,10 +1,10 @@
 ﻿using System.Reflection;
 
-[assembly: AssemblyTitle("AvatarMotionTweaker")]
-[assembly: AssemblyVersion("1.0.3")]
-[assembly: AssemblyFileVersion("1.0.3")]
+[assembly: AssemblyTitle("AvatarMotionTweaker (Saracen Tweaks)")]
+[assembly: AssemblyVersion("1.0.3.1")]
+[assembly: AssemblyFileVersion("1.0.3.1")]
 
-[assembly: MelonLoader.MelonInfo(typeof(ml_amt.AvatarMotionTweaker), "AvatarMotionTweaker", "1.0.3", "SDraw", "https://github.com/SDraw/ml_mods_cvr")]
+[assembly: MelonLoader.MelonInfo(typeof(ml_amt.AvatarMotionTweaker), "AvatarMotionTweaker (Saracen Tweaks)", "1.0.3.1", "SDraw/Saracen", "https://github.com/SaracenOne/ml_mods_cvr")]
 [assembly: MelonLoader.MelonGame(null, "ChilloutVR")]
 [assembly: MelonLoader.MelonPlatform(MelonLoader.MelonPlatformAttribute.CompatiblePlatforms.WINDOWS_X64)]
 [assembly: MelonLoader.MelonPlatformDomain(MelonLoader.MelonPlatformDomainAttribute.CompatibleDomains.MONO)]
