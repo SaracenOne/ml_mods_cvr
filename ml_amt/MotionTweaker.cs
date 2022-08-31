@@ -1,4 +1,6 @@
-﻿using ABI_RC.Core.Player;
+﻿using ABI_RC.Core.Networking.IO.UserGeneratedContent;
+using ABI_RC.Core.Player;
+using ABI_RC.Systems.MovementSystem;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -31,10 +33,13 @@ namespace ml_amt
         bool m_ready = false;
 
         bool m_standing = true;
+        bool m_prone = false;
         float m_currentUpright = 1f;
         float m_locomotionWeight = 1f;
         float m_crouchLimit = 0.65f;
+        float m_proneLimit = 0.35f;
         bool m_customCrouchLimit = false;
+        bool m_customProneLimit = false;
 
         readonly List<AdditionalParameterInfo> m_parameters = null;
 
@@ -59,11 +64,55 @@ namespace ml_amt
                 float l_avatarViewHeight = Mathf.Clamp(PlayerSetup.Instance.GetViewPointHeight() * PlayerSetup.Instance._avatar.transform.localScale.y, 0f, float.MaxValue);
                 m_currentUpright = Mathf.Clamp((((l_currentHeight > 0f) && (l_avatarViewHeight > 0f)) ? (l_currentHeight / l_avatarViewHeight) : 0f), 0f, 1f);
                 m_standing = (m_currentUpright > m_crouchLimit);
+                m_prone = (m_currentUpright < m_proneLimit);
 
-                if((m_vrIk != null) && m_vrIk.enabled && !PlayerSetup.Instance._movementSystem.sitting && (PlayerSetup.Instance._movementSystem.movementVector.magnitude <= Mathf.Epsilon) && !PlayerSetup.Instance.fullBodyActive)
+                if((m_vrIk != null) && m_vrIk.enabled && !PlayerSetup.Instance._movementSystem.sitting && !PlayerSetup.Instance.fullBodyActive)
                 {
-                    m_locomotionWeight = Mathf.Lerp(m_locomotionWeight, m_standing ? 1f : 0f, 0.5f);
+                    float immobileWeight = (PlayerSetup.Instance._movementSystem.movementVector.magnitude <= Mathf.Epsilon) ? 1f : 0f;
+                    float standingWeight = m_standing ? 1f : 0f;
+                    m_locomotionWeight = standingWeight * immobileWeight;
                     m_vrIk.solver.locomotion.weight = m_locomotionWeight;
+
+                    // Immediately update avatar position if locomotion is off
+                    if (m_locomotionWeight <= Mathf.Epsilon) {
+                        Transform headTransform = PlayerSetup.Instance._animator.GetBoneTransform(HumanBodyBones.Head);
+                        if (headTransform != null)
+                        {
+                            Vector3 position = headTransform.position;
+                            {
+                                PlayerSetup.Instance._avatar.transform.position = new Vector3(
+                                    position.x,
+                                    PlayerSetup.Instance._avatar.transform.position.y,
+                                    position.z);
+                                headTransform.position = position;
+                            }
+                        }
+                    }
+
+                    if (!m_standing)
+                    {
+                        if (m_prone)
+                        {
+                            MovementSystem.Instance.ChangeCrouch(false);
+                            MovementSystem.Instance.ChangeProne(true);
+                            PlayerSetup.Instance._animator.SetBool("Crouching", false);
+                            PlayerSetup.Instance._animator.SetBool("Prone", true);
+                        }
+                        else
+                        {
+                            MovementSystem.Instance.ChangeCrouch(true);
+                            MovementSystem.Instance.ChangeProne(false);
+                            PlayerSetup.Instance._animator.SetBool("Crouching", true);
+                            PlayerSetup.Instance._animator.SetBool("Prone", false);
+                        }
+                    } 
+                    else
+                    {
+                        MovementSystem.Instance.ChangeCrouch(false);
+                        MovementSystem.Instance.ChangeProne(false);
+                        PlayerSetup.Instance._animator.SetBool("Crouching", false);
+                        PlayerSetup.Instance._animator.SetBool("Prone", false);
+                    }
                 }
 
                 if(m_parameters.Count > 0)
@@ -99,6 +148,7 @@ namespace ml_amt
             m_parameters.Clear();
             m_locomotionWeight = 1f;
             m_crouchLimit = 0.65f;
+            m_proneLimit = 0.35f;
             m_customCrouchLimit = false;
         }
 
@@ -131,9 +181,12 @@ namespace ml_amt
                 }
             }
 
-            Transform l_customLimit = PlayerSetup.Instance._avatar.transform.Find("CrouchLimit");
-            m_customCrouchLimit = (l_customLimit != null);
-            m_crouchLimit = m_customCrouchLimit ? Mathf.Clamp(l_customLimit.localPosition.y, 0f, 1f) : Settings.CrouchLimit;
+            Transform l_customCrouchLimit = PlayerSetup.Instance._avatar.transform.Find("CrouchLimit");
+            Transform l_customProneLimit = PlayerSetup.Instance._avatar.transform.Find("ProneLimit");
+            m_customCrouchLimit = (l_customCrouchLimit != null);
+            m_crouchLimit = m_customCrouchLimit ? Mathf.Clamp(l_customCrouchLimit.localPosition.y, 0f, 1f) : Settings.CrouchLimit;
+            m_customProneLimit = (l_customCrouchLimit != null);
+            m_proneLimit = m_customProneLimit ? Mathf.Clamp(l_customProneLimit.localPosition.y, 0f, 1f) : Settings.ProneLimit;
 
             m_ready = true;
         }
@@ -142,6 +195,12 @@ namespace ml_amt
         {
             if(!m_customCrouchLimit)
                 m_crouchLimit = Mathf.Clamp(p_value, 0f, 1f);
+        }
+
+        public void SetProneLimit(float p_value)
+        {
+            if (!m_customProneLimit)
+                m_proneLimit = Mathf.Clamp(p_value, 0f, 1f);
         }
     }
 }

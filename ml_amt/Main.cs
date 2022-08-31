@@ -14,6 +14,7 @@ namespace ml_amt
 
             Settings.Init();
             Settings.CrouchLimitChange += this.OnCrouchLimitChange;
+            Settings.ProneLimitChange += this.OnProneLimitChange;
 
             HarmonyInstance.Patch(
                 typeof(PlayerSetup).GetMethod(nameof(PlayerSetup.ClearAvatar)),
@@ -42,6 +43,12 @@ namespace ml_amt
         {
             if(m_localTweaker != null)
                 m_localTweaker.SetCrouchLimit(p_value);
+        }
+
+        void OnProneLimitChange(float p_value)
+        {
+            if (m_localTweaker != null)
+                m_localTweaker.SetProneLimit(p_value);
         }
 
         static void OnLocalAvatarSetup_Postfix() => ms_instance?.OnLocalAvatarSetup();

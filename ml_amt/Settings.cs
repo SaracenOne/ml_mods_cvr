@@ -10,15 +10,18 @@ namespace ml_amt
     {
         enum ModSetting
         {
-            CrouchLimit = 0
+            CrouchLimit = 0,
+            ProneLimit
         };
 
         static float ms_crouchLimit = 0.65f;
+        static float ms_proneLimit = 0.35f;
 
         static MelonLoader.MelonPreferences_Category ms_category = null;
         static List<MelonLoader.MelonPreferences_Entry> ms_entries = null;
 
         static public event Action<float> CrouchLimitChange;
+        static public event Action<float> ProneLimitChange;
 
         public static void Init()
         {
@@ -26,6 +29,7 @@ namespace ml_amt
 
             ms_entries = new List<MelonLoader.MelonPreferences_Entry>();
             ms_entries.Add(ms_category.CreateEntry(ModSetting.CrouchLimit.ToString(), 65));
+            ms_entries.Add(ms_category.CreateEntry(ModSetting.ProneLimit.ToString(), 35));
 
             Load();
 
@@ -56,6 +60,7 @@ namespace ml_amt
         static void Load()
         {
             ms_crouchLimit = ((int)ms_entries[(int)ModSetting.CrouchLimit].BoxedValue) * 0.01f;
+            ms_proneLimit = ((int)ms_entries[(int)ModSetting.ProneLimit].BoxedValue) * 0.01f;
         }
 
         static void OnSliderUpdate(string p_name, string p_value)
@@ -69,6 +74,11 @@ namespace ml_amt
                         ms_crouchLimit = ((int)ms_entries[(int)ModSetting.CrouchLimit].BoxedValue) * 0.01f;
                         CrouchLimitChange?.Invoke(ms_crouchLimit);
                     } break;
+                    case ModSetting.ProneLimit:
+                    {
+                        ms_proneLimit = ((int)ms_entries[(int)ModSetting.ProneLimit].BoxedValue) * 0.01f;
+                        ProneLimitChange?.Invoke(ms_proneLimit);
+                    } break;
                 }
 
                 ms_entries[(int)l_setting].BoxedValue = int.Parse(p_value);
@@ -78,6 +88,11 @@ namespace ml_amt
         public static float CrouchLimit
         {
             get => ms_crouchLimit;
+        }
+
+        public static float ProneLimit
+        {
+            get => ms_proneLimit;
         }
     }
 }

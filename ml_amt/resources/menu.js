@@ -138,6 +138,13 @@ function inp_slider_mod_amt(_obj, _callbackName) {
                 <div id="CrouchLimit" class ="inp_slider no-scroll" data-min="0" data-max="100" data-current="65"></div>
             </div>
         </div>
+
+        <div class ="row-wrapper">
+            <div class ="option-caption">Legs locomotion crouch limit: </div>
+            <div class ="option-input">
+                <div id="ProneLimit" class ="inp_slider no-scroll" data-min="0" data-max="100" data-current="35"></div>
+            </div>
+        </div>
     `;
     document.getElementById('settings-implementation').appendChild(l_block);
 
