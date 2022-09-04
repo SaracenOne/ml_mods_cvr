@@ -186,7 +186,7 @@ namespace ml_amt
             Transform l_customProneLimit = PlayerSetup.Instance._avatar.transform.Find("ProneLimit");
             m_customCrouchLimit = (l_customCrouchLimit != null);
             m_crouchLimit = m_customCrouchLimit ? Mathf.Clamp(l_customCrouchLimit.localPosition.y, 0f, 1f) : Settings.CrouchLimit;
-            m_customProneLimit = (l_customCrouchLimit != null);
+            m_customProneLimit = (l_customProneLimit != null);
             m_proneLimit = m_customProneLimit ? Mathf.Clamp(l_customProneLimit.localPosition.y, 0f, 1f) : Settings.ProneLimit;
 
             m_ready = true;
